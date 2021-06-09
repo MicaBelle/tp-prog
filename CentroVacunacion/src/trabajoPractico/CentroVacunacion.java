@@ -37,11 +37,10 @@ public class CentroVacunacion {
 	public void ingresarVacunas(String nombreVacuna, int cantidad, Fecha fechaIngreso) {
 		if (cantidad <= 0) 
 			throw new RuntimeException ("La cantidad no puede ser negativa");
-		//por alguna razón siempre entra acá
 		if (Almacen.esValida(nombreVacuna)) {
 			Almacen.ingresarVacuna(nombreVacuna, cantidad,  fechaIngreso); 
 		} else { 
-			throw new RuntimeException ("El nombre ingresado no es válido"); 
+			throw new RuntimeException ("El nombre ingresado no es v�lido"); 
 		}
 	}
 	
@@ -60,21 +59,10 @@ public class CentroVacunacion {
 	}
 	
 	
-	/**
-	* Se inscribe una persona en lista de espera.
-	* Si la persona ya se encuentra inscripta o es menor de 18 años, se debe
-	* generar una excepción.
-	* Si la persona ya fue vacunada, también debe generar una excepción.
-	*/
 	public void inscribirPersona(int dni, Fecha nacimiento, boolean tienePadecimientos, boolean esEmpleadoSalud) {
 		Administracion.ingresarPersona(dni, nacimiento, tienePadecimientos, esEmpleadoSalud);
 	}
 	
-	/**
-	* Devuelve una lista con los DNI de todos los inscriptos que no se vacunaron
-	* y que no tienen turno asignado.
-	* Si no quedan inscriptos sin vacunas debe devolver una lista vacía.
-	*/
 	public List<Integer> listaDeEspera() {
 		return administracion.listaDeEspera();
 		}
@@ -97,7 +85,6 @@ public class CentroVacunacion {
 	public void generarTurnos(Fecha fechaInicial) { 
 		if (fecha.hoy().posterior(fechaInicial))
 			throw new RuntimeException ("No se pueden generar turnos para una fecha pasada");
-		
 		// el centro debe recibir la info de los seleccionados y las vacunas, luego se generan turnos y se asignan a las personas, recordar que se esta usando aliasing, tener cuidado
 		// IMPORTANTE si no alcanzan las vacunas debe dejar de asiganrles, en caso de no haber suficientes personas no pasa nada ya que esta comtemplado en asignarPersonas
 		ArrayList<Persona> seleccionados = administracion.asignarPersonas(this.capacidad);
@@ -106,11 +93,11 @@ public class CentroVacunacion {
 		// recordar que si las vacunas de prio 1 no alcanzan entonces llenar con otras vacunas
 		HashSet<Vacuna> vacunasListas = almacen.asignarVacunasEspeciales(this.capacidad);
 		
-		for(Persona p: seleccionados) {
-			if(p.getPrioridad() == 1) {
-				for(Vacuna v: vacunasListas)
-			}
-		}
+//		for(Persona p: seleccionados) {
+//			if(p.getPrioridad() == 1) {
+//				for(Vacuna v: vacunasListas)
+//			}
+//		}
 	}
 	
 	/**
@@ -133,21 +120,12 @@ public class CentroVacunacion {
 	public void vacunarInscripto(int dni, Fecha fechaVacunacion) { 
 		Administracion.vacunarInscripto(dni, fechaVacunacion);
 	}
-	
-	/**
-	* Devuelve un Diccionario donde
-	* - la clave es el dni de las personas vacunadas
-	* - Y, el valor es el nombre de la vacuna aplicada.
-	*/
+
 	public Map<Integer, String> reporteVacunacion(){
 		return administracion.reporteVacunacion();
 	}
 	
-	/**
-	* Devuelve en O(1) un Diccionario:
-	* - clave: nombre de la vacuna
-	* - valor: cantidad de vacunas vencidas conocidas hasta el momento.
-	*/
+
 	public Map<String, Integer> reporteVacunasVencidas(){
 		return Almacen.reporteVacunasVencidas();
 	}

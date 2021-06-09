@@ -21,6 +21,10 @@ public abstract class Vacuna {
 		return this.nombre;
 	}
 	
+	public Fecha getFechaIngreso() {
+		return this.fechaIngreso;
+	}
+	
 	public Integer getTemperatura() { 
 		return this.temperatura;
 	}

@@ -7,6 +7,11 @@ public class Fecha implements Comparable<Fecha> {
 
 	/***************** Estatico ***********************/
 
+	@Override
+	public String toString() {
+		return "fecha " + fecha;
+	}
+
 	/**
 	 * define cual es el dia actual.
 	 */

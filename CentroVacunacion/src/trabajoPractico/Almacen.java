@@ -31,7 +31,7 @@ public class Almacen {
 	
 	public static void ingresarVacuna(String nombre, int Cantidad, Fecha fechaIngreso) {
 		if(stock.containsKey(nombre) && stock.size() >0) {
-			Integer canttidadActualizada = new Integer((stock.get(nombre)+(Integer)Cantidad));
+			Integer canttidadActualizada = new Integer(stock.get(nombre)+(Integer)Cantidad);
 			stock.put(nombre, canttidadActualizada);
 			
 			if (nombre.equals("Sputnik")) {
@@ -92,17 +92,20 @@ public class Almacen {
 	}
 	
 	public static void quitarVencidas() { 
-		Iterator it = listaVacunas.iterator();
-		
-		while(it.hasNext()){
-			Vacuna v = (Vacuna) it.next();
+		for (Vacuna v : listaVacunas)
 			if(v.vencida()) {
 				stock.put(v.getNombre(), stock.get(v.getNombre())-1);
 				vencidas.replace(v.getNombre(), vencidas.get(v.getNombre())+1);
-				it.remove();
 			}
-			it.next();
-		}
+	}
+	
+	public static StringBuilder dameVencidas() { 
+		StringBuilder s = new StringBuilder();
+		for (Vacuna v : listaVacunas)
+			if(v.vencida()) {
+				s.append(v.getNombre());
+			}
+		return s; 
 	}
 	
 	public HashSet<Vacuna> asignarVacunasEspeciales(int capacidad) {
@@ -142,7 +145,6 @@ public class Almacen {
 		
 		int contador = 0;
 		for (Vacuna v: listaVacunas) { 
-			// aca hay que modificar el stock para que coincidan
 			contador += 1;
 		}
 		return contador;

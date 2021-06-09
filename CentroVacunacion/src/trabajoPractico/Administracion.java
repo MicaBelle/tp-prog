@@ -9,64 +9,68 @@ import java.util.List;
 
 public class Administracion {
 
-	private static HashSet<Persona> listaEspera;
+	private static HashSet<Persona> personas;
 	private static HashSet<Persona> colaPrioridad;
 	private static HashMap<Integer, String> historialVacunados;
 	private static HashMap<Integer, Fecha> turnosGenerados;
 	
 	public Administracion() {
-		this.listaEspera = new HashSet<Persona>();
+		this.personas = new HashSet<Persona>();
 		this.colaPrioridad = new HashSet<Persona>();
 		this.historialVacunados = new HashMap<Integer, String>();
 		this.turnosGenerados = new HashMap <Integer, Fecha>();
 	}
 	
 	public static void ingresarPersona(int dni, Fecha nacimiento, boolean tienePadecimientos, boolean esTrabajadorSalud) {
-		if (listaEspera.contains(dni))
-			throw new RuntimeException ("Esta persona ya estï¿½ inscripta");
+		if (personas.contains(dni))
+			throw new RuntimeException ("Esta persona ya está inscripta");
 		if (nacimiento.diferenciaAnios(Fecha.hoy(), nacimiento) < 18) {
 			throw new RuntimeException ("No se puede ingresar un menor de edad");
 		} 
+		if (historialVacunados.containsKey(dni)) {
+			throw new RuntimeException("Esta persona ya se encuentra vacunada");
+		}
 		else if (nacimiento.diferenciaAnios(Fecha.hoy(), nacimiento) > 60) {
-			listaEspera.add(new Persona(dni, nacimiento, 1));
+			personas.add(new Persona(dni, nacimiento, 1));
 		} else if (esTrabajadorSalud) {
-			listaEspera.add(new Persona(dni, nacimiento, 2));
+			personas.add(new Persona(dni, nacimiento, 2));
 		} else if (tienePadecimientos) {
-			listaEspera.add(new Persona(dni, nacimiento, 3));
+			personas.add(new Persona(dni, nacimiento, 3));
 		} else { 
-			listaEspera.add(new Persona(dni, nacimiento, 4));
+			personas.add(new Persona(dni, nacimiento, 4));
 		}
 		asignarColaPrioridad();
 	}
 	
-	//FIXME
 	private static void asignarColaPrioridad() {
-		//recorrer personas y compararlas para ingresarlas en orden segun prioridad de 1 a 4 :)
-		
 		for(int i = 0; i<4; i++) {
-			for(Persona p : listaEspera) {
+			for(Persona p : personas) {
 				if(p.getPrioridad() == i+1) {
 					colaPrioridad.add(p);
 				}
 			}
 		}
+		personas.clear();
 	}
 	
-	public void generarTurnos(Fecha fechaInicial) {
-		
-		for (Persona p : listaEspera) {
-			if (p.getTurno().posterior(fechaInicial)) 
-				p = null;
+	public void generarTurnos(Fecha fechaInicial) {	
+		for (Integer clave : turnosGenerados.keySet()){
+			 if (turnosGenerados.get(clave).anterior(fechaInicial)) {
+				 turnosGenerados.remove(clave, fechaInicial);
+				 for (Persona p : colaPrioridad) { 	
+					 p = null;
+				 }
+			 }
 		}
-
+		
 		Almacen.quitarVencidas();
 		
-		for (int i= 0;  i < CentroVacunacion.getCapacidad(); i++) { //hasta cubrir capacidad
+		for (int i= 0;  i < CentroVacunacion.getCapacidad(); i++) { 
 			for (Persona p : colaPrioridad) { 
 					turnosGenerados.put(p.getDni(), fechaInicial);
-				}
-			}
+			}	
 		}
+	 }
 	
 	public List<Integer> turnosConFecha(Fecha fecha){
 		List <Integer> turnosConFecha = new LinkedList <Integer>();
@@ -79,7 +83,7 @@ public class Administracion {
 	}
   
 	public boolean verificaTurno(Persona persona) {	
-		return turnosGenerados.containsKey(persona) && persona.getTurno().equals(Fecha.hoy());
+		return turnosGenerados.containsKey(persona.getDni()) && persona.getTurno().equals(Fecha.hoy());
 	}
 	
 	public static void vacunarInscripto(int dni, Fecha fecha) {
@@ -96,7 +100,7 @@ public class Administracion {
 		 	}
 		 }
 		 if (!encontrado) 
-			 throw new RuntimeException ("La persona no se encuentra registrada o no tiene fecha para ese dï¿½a");
+			 throw new RuntimeException ("La persona no se encuentra registrada o no tiene fecha para ese día");
 		}
 	
 	
@@ -106,7 +110,7 @@ public class Administracion {
 
 	public List<Integer> listaDeEspera() {
 		List <Integer> lista = new LinkedList <Integer>();
-		for (Persona p : listaEspera) {
+		for (Persona p : colaPrioridad) {
 			if(p.getTurno() == null && !p.getVacunado()) {
 				Integer aux = new Integer(p.getDni());
 				lista.add(aux);
