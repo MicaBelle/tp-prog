@@ -11,11 +11,13 @@ public class Almacen {
 	private static HashMap<String, Integer> stock;
 	private static HashMap<String, Integer> vencidas;
 	private static HashSet<Vacuna> listaVacunas;
+	private static HashSet<Vacuna> reservadas;
 	
 	public Almacen () { 
 		this.stock = new HashMap <String,Integer>();
 		this.vencidas = new HashMap <String,Integer>();
 		this.listaVacunas = new HashSet <Vacuna>();
+		this.reservadas = new HashSet<Vacuna>();
 	}
 	
 	public static HashMap<String,Integer> reporteVacunasVencidas() {
@@ -30,9 +32,9 @@ public class Almacen {
 	}
 	
 	public static void ingresarVacuna(String nombre, int Cantidad, Fecha fechaIngreso) {
-		if(stock.containsKey(nombre) && stock.size() >0) {
-			Integer canttidadActualizada = new Integer(stock.get(nombre)+(Integer)Cantidad);
-			stock.put(nombre, canttidadActualizada);
+		if(stock.containsKey(nombre)) {
+			Integer cantidadActualizada = stock.get(nombre);
+			stock.put(nombre, cantidadActualizada);
 			
 			if (nombre.equals("Sputnik")) {
 				for(int i = 0; i<Cantidad; i++) {
@@ -107,40 +109,8 @@ public class Almacen {
 			}
 		return s; 
 	}
-	
-	public HashSet<Vacuna> asignarVacunasEspeciales(int capacidad) {
-		HashSet <Vacuna> vacunasListas = new HashSet <Vacuna>();
-  
-		Integer contador = capacidad;
-		for (Vacuna v : listaVacunas) {
-			if(contador > 0 && v.getPrioridadMayores()) {
-				contador--;
-				v.setAsignadaEnEspera();
-				vacunasListas.add(v);
-			}
-			else { 
-				break;
-			}
-		}
-		return vacunasListas;
-	}
-	
-	public HashSet<Vacuna> asignarVacunasGenerales(int capacidad) {
-		HashSet <Vacuna> vacunasListas = new HashSet <Vacuna>();
-		Integer contador = capacidad;
-		for (Vacuna v : listaVacunas) {
-			if(contador > 0 && !v.getPrioridadMayores()) {
-				contador--;
-				v.setAsignadaEnEspera();
-				vacunasListas.add(v);
-			}
-			else { 
-				break;
-			}
-		}
-		return vacunasListas;
-	}
-		
+
+
 	public static int vacunasDisponibles() { 
 		
 		int contador = 0;
@@ -168,6 +138,7 @@ public class Almacen {
 					return "Sputnik";
 				}
 			}
+			Almacen.reasignarVacunas();
 		} else {
 			for (String v : stock.keySet()) {
 				if (v == "Moderna" && stock.get(v) > 0) {
@@ -181,10 +152,28 @@ public class Almacen {
 					return "AstraZeneca";
 					} 
 				}
+			Almacen.reasignarVacunas();
 			}
 			throw new RuntimeException ("No hay vacunas disponibles");
 		}
 
+	public static void reasignarVacunas() {
+		int contador = CentroVacunacion.getCapacidad();
+		for (Vacuna v : listaVacunas) {
+			if (CentroVacunacion.getCapacidad() == 1 && contador > 0 && v.getPrioridadMayores()) {
+					contador--;
+					reservadas.add(v);
+					listaVacunas.remove(v);
+			} else if(contador > 0 && !v.getPrioridadMayores()) {
+				contador--;
+				reservadas.add(v);
+				listaVacunas.remove(v);
+			}
+			else 
+				break;
+		}
+	}
+		
 }
 
 

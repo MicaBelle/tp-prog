@@ -91,13 +91,6 @@ public class CentroVacunacion {
 		// una vez recibidas las personas se debe buscar las vacunas para los de prioridad 1, osea saber la cantidad de personas en esa prioridad y luego buscar esa cantidad de vacunas
 		//luego de las vacunas de prioridad 1 hay que buscar las que quedan, es decir de la capacidad total restar las de prioridad 1
 		// recordar que si las vacunas de prio 1 no alcanzan entonces llenar con otras vacunas
-		HashSet<Vacuna> vacunasListas = almacen.asignarVacunasEspeciales(this.capacidad);
-		
-//		for(Persona p: seleccionados) {
-//			if(p.getPrioridad() == 1) {
-//				for(Vacuna v: vacunasListas)
-//			}
-//		}
 	}
 	
 	/**

@@ -12,13 +12,13 @@ public class Administracion {
 	private static HashSet<Persona> personas;
 	private static HashSet<Persona> colaPrioridad;
 	private static HashMap<Integer, String> historialVacunados;
-	private static HashMap<Integer, Fecha> turnosGenerados;
+	private static HashMap<Integer, Persona> turnosGenerados;
 	
 	public Administracion() {
 		this.personas = new HashSet<Persona>();
 		this.colaPrioridad = new HashSet<Persona>();
 		this.historialVacunados = new HashMap<Integer, String>();
-		this.turnosGenerados = new HashMap <Integer, Fecha>();
+		this.turnosGenerados = new HashMap <Integer, Persona>();
 	}
 	
 	public static void ingresarPersona(int dni, Fecha nacimiento, boolean tienePadecimientos, boolean esTrabajadorSalud) {
@@ -53,13 +53,13 @@ public class Administracion {
 		personas.clear();
 	}
 	
+	//FIXME
 	public void generarTurnos(Fecha fechaInicial) {	
+		//esto funciona borrando una entrada del iterador??????
 		for (Integer clave : turnosGenerados.keySet()){
-			 if (turnosGenerados.get(clave).anterior(fechaInicial)) {
+			 if (turnosGenerados.get(clave).getTurno().equals(fechaInicial)) {
 				 turnosGenerados.remove(clave, fechaInicial);
-				 for (Persona p : colaPrioridad) { 	
-					 p = null;
-				 }
+				 Almacen.asignarVacuna(turnosGenerados.get(clave).getPrioridad());
 			 }
 		}
 		
@@ -67,10 +67,12 @@ public class Administracion {
 		
 		for (int i= 0;  i < CentroVacunacion.getCapacidad(); i++) { 
 			for (Persona p : colaPrioridad) { 
-					turnosGenerados.put(p.getDni(), fechaInicial);
-			}	
+					p.setTurno(fechaInicial);
+					turnosGenerados.put(p.getDni(), p);
+			}
 		}
-	 }
+		colaPrioridad.removeAll(colaPrioridad);
+	}
 	
 	public List<Integer> turnosConFecha(Fecha fecha){
 		List <Integer> turnosConFecha = new LinkedList <Integer>();
@@ -94,7 +96,6 @@ public class Administracion {
 				for (Persona p : colaPrioridad) {
 					if (p.getDni() == clave)
 						p.setVacunado();
-						Almacen.asignarVacuna(p.getPrioridad());
 						historialVacunados.put(p.getDni(), Almacen.asignarVacuna(p.getPrioridad()));
 				}
 		 	}
@@ -112,8 +113,7 @@ public class Administracion {
 		List <Integer> lista = new LinkedList <Integer>();
 		for (Persona p : colaPrioridad) {
 			if(p.getTurno() == null && !p.getVacunado()) {
-				Integer aux = new Integer(p.getDni());
-				lista.add(aux);
+				lista.add(p.getDni());
 			}
 		}
 		return lista;

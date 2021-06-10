@@ -8,7 +8,7 @@ public class VacunaMenos18 extends Vacuna{
 	
 	@Override
 	public boolean vencida() {
-		if (super.getNombre().equals("Pfizer")) {
+		if (this.getNombre().equals("Pfizer")) {
 			Fecha vencimientoPfizer = new Fecha(fechaIngreso);
 			for (int i =0; i < 30; i++) {
 				vencimientoPfizer.avanzarUnDia();
@@ -17,7 +17,7 @@ public class VacunaMenos18 extends Vacuna{
 				return true; 
 			else 
 				return false;
-		} else if (super.getNombre().equals("Moderna")) {
+		} else if (this.getNombre().equals("Moderna")) {
 			Fecha vencimientoModerna = new Fecha(fechaIngreso);
 			for (int i =0; i < 60; i++) {
 				vencimientoModerna.avanzarUnDia();
