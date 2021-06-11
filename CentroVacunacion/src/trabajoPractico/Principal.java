@@ -10,15 +10,17 @@ public class Principal {
 		System.out.println(centro);
 		System.out.println("-----------------------------------");
 		System.out.println();
-
-		centro.ingresarVacunas("Moderna", 10, new Fecha(15,6,2021));
-		centro.ingresarVacunas("Pfizer", 10, new Fecha(15,5,2021));
+		
+		centro.ingresarVacunas("Pfizer", 10, new Fecha(30,3,2021));
+		centro.ingresarVacunas("Pfizer", 10, new Fecha(20,4,2021));
+		centro.ingresarVacunas("Pfizer", 10, new Fecha(10,6,2021));
 		
 		//unico
 		System.out.println("Vacunas: " + centro.vacunasDisponibles());
 		System.out.println("Vacuna Pfizer: " + centro.vacunasDisponibles("Pfizer")); 
 		System.out.println("Vacuna Moderna: " + centro.vacunasDisponibles("Moderna")); //tira error cuando cambio la cant ingresada
 		System.out.println("Vencidas: " + centro.reporteVacunasVencidas());
+		System.out.println("Vacunas: " + centro.vacunasDisponibles());
 		
 		centro.inscribirPersona(34701000, new Fecha(1, 5, 1989), false, false);
 		centro.inscribirPersona(29959000, new Fecha(20, 11, 1982), false, true);
@@ -29,7 +31,8 @@ public class Principal {
 		
 		centro.generarTurnos(fTurnos);
 
-
+		System.out.println("Vencidas: " + centro.reporteVacunasVencidas());
+		
 		System.out.println("-------------- Turnos -------------");
 		System.out.println("Lista espera: " + centro.listaDeEspera());
 		System.out.println("Turnos con " + fTurnos + ": " + centro.turnosConFecha(fTurnos));

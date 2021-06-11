@@ -32,87 +32,64 @@ public class Almacen {
 	}
 	
 	public static void ingresarVacuna(String nombre, int Cantidad, Fecha fechaIngreso) {
-		if(stock.containsKey(nombre)) {
-			Integer cantidadActualizada = stock.get(nombre);
-			stock.put(nombre, cantidadActualizada);
-			
+			int c = 0;
+			if (stock.containsKey(nombre))
+				c = stock.get(nombre);
 			if (nombre.equals("Sputnik")) {
 				for(int i = 0; i<Cantidad; i++) {
 					listaVacunas.add(new Vacuna3Grados(nombre,true,fechaIngreso));
 				}
+				if (stock.containsKey(nombre))
+					stock.replace(nombre, Cantidad + c);
+				else 
+					stock.put(nombre, Cantidad);
 			}
-			if (nombre.equals("Pfizer")) {
-				for(int i = 0; i<Cantidad; i++) {
-					listaVacunas.add(new VacunaMenos18(nombre,true,fechaIngreso));
-				}
-			}
-			if (nombre.equals("Sinopharm")) {
+			if (nombre.equals("Sinopharm") || nombre.equals("AstraZeneca")) {
 				for(int i = 0; i<Cantidad; i++) {
 					listaVacunas.add(new Vacuna3Grados(nombre,false,fechaIngreso));
 				}
+				if (stock.containsKey(nombre))
+					stock.replace(nombre, Cantidad + c);
+				else 
+					stock.put(nombre, Cantidad);
 			}
-			if (nombre.equals("Moderna")) { 
+			if (nombre.equals("Moderna") || nombre.equals("Pfizer")) { 
 				for(int i = 0; i<Cantidad; i++) {
 					listaVacunas.add(new VacunaMenos18(nombre,false,fechaIngreso));
 				}
+				if (stock.containsKey(nombre))
+					stock.replace(nombre, Cantidad + c);
+				else 
+					stock.put(nombre, Cantidad);
 			}
-			if (nombre.equals("AstraZeneca")) {
-				for(int i = 0; i<Cantidad; i++) {
-					listaVacunas.add(new Vacuna3Grados(nombre,false,fechaIngreso));
-				}
-			}
-		}
-		else {
-			stock.put(nombre, Cantidad);
-			
-			if (nombre.equals("Sputnik")) {
-				for(int i = 0; i<Cantidad; i++) {
-					listaVacunas.add(new Vacuna3Grados(nombre,true,fechaIngreso));
-				}
-			}
-			if (nombre.equals("Pfizer")) {
-				for(int i = 0; i<Cantidad; i++) {
-					listaVacunas.add(new VacunaMenos18(nombre,true,fechaIngreso));
-				}
-			}
-			if (nombre.equals("Sinopharm")) {
-				for(int i = 0; i<Cantidad; i++) {
-					listaVacunas.add(new Vacuna3Grados(nombre,false,fechaIngreso));
-				}
-			}
-			if (nombre.equals("Moderna")) { 
-				for(int i = 0; i<Cantidad; i++) {
-					listaVacunas.add(new VacunaMenos18(nombre,false,fechaIngreso));
-				}
-			}
-			if (nombre.equals("AstraZeneca")) {
-				for(int i = 0; i<Cantidad; i++) {
-					listaVacunas.add(new Vacuna3Grados(nombre,false,fechaIngreso));
-				}
-			}
-		}
 	}
 	
 	public static void quitarVencidas() { 
-		for (Vacuna v : listaVacunas)
-			if(v.vencida()) {
-				stock.put(v.getNombre(), stock.get(v.getNombre())-1);
-				vencidas.replace(v.getNombre(), vencidas.get(v.getNombre())+1);
+		int auxVencidas = 0;
+		int auxStock = 0;
+		Iterator <Vacuna> it = listaVacunas.iterator();
+		while (it.hasNext()) {
+			Vacuna otra = it.next();
+			if (otra.vencida()) {
+				if (vencidas.containsKey(otra.getNombre())) {
+					auxVencidas = vencidas.get(otra.getNombre());
+					vencidas.replace(otra.getNombre(), auxVencidas + 1);
+				} else {
+					vencidas.put(otra.getNombre(), 1);
+			} if (stock.get(otra.getNombre()) > 0) {
+					auxStock = stock.get(otra.getNombre());
+					stock.replace(otra.getNombre(), auxStock-1);
+					it.remove();
+			} else 
+				it.remove();
+				
 			}
+		}
 	}
-	
-	public static StringBuilder dameVencidas() { 
-		StringBuilder s = new StringBuilder();
-		for (Vacuna v : listaVacunas)
-			if(v.vencida()) {
-				s.append(v.getNombre());
-			}
-		return s; 
-	}
-
+			
+		
 
 	public static int vacunasDisponibles() { 
-		
 		int contador = 0;
 		for (Vacuna v: listaVacunas) { 
 			contador += 1;
@@ -159,15 +136,17 @@ public class Almacen {
 
 	public static void reasignarVacunas() {
 		int contador = CentroVacunacion.getCapacidad();
-		for (Vacuna v : listaVacunas) {
-			if (CentroVacunacion.getCapacidad() == 1 && contador > 0 && v.getPrioridadMayores()) {
+		Iterator <Vacuna> it = listaVacunas.iterator();
+		while (it.hasNext()) {
+			Vacuna otra = it.next();
+			if (CentroVacunacion.getCapacidad() == 1 && contador > 0 && otra.getPrioridadMayores()) {
 					contador--;
-					reservadas.add(v);
-					listaVacunas.remove(v);
-			} else if(contador > 0 && !v.getPrioridadMayores()) {
+					reservadas.add(otra);
+					it.remove();
+			} else if(contador > 0 && !otra.getPrioridadMayores()) {
 				contador--;
-				reservadas.add(v);
-				listaVacunas.remove(v);
+				reservadas.add(otra);
+				it.remove();
 			}
 			else 
 				break;

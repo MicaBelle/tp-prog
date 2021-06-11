@@ -53,17 +53,16 @@ public class Administracion {
 		personas.clear();
 	}
 	
-	//FIXME
+	
 	public void generarTurnos(Fecha fechaInicial) {	
-		//esto funciona borrando una entrada del iterador??????
-		for (Integer clave : turnosGenerados.keySet()){
-			 if (turnosGenerados.get(clave).getTurno().equals(fechaInicial)) {
-				 turnosGenerados.remove(clave, fechaInicial);
-				 Almacen.asignarVacuna(turnosGenerados.get(clave).getPrioridad());
+		Iterator<Integer> itClaves = turnosGenerados.keySet().iterator();
+		while (itClaves.hasNext()) {
+			int dni = itClaves.next();
+			 if (turnosGenerados.get(dni).getTurno().equals(fechaInicial)) {
+				 itClaves.remove();
+				 Almacen.asignarVacuna(turnosGenerados.get(dni).getPrioridad());
 			 }
 		}
-		
-		Almacen.quitarVencidas();
 		
 		for (int i= 0;  i < CentroVacunacion.getCapacidad(); i++) { 
 			for (Persona p : colaPrioridad) { 
