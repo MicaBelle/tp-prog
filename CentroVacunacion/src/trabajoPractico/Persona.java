@@ -6,8 +6,13 @@ public class Persona implements Comparable<Persona> {
 	private  int edad;
 	private  int prioridad;
 	private  Fecha turno;
-	private  boolean vacunado;
 	
+	public Persona(int dni, Fecha nacimiento, int prioridad) {
+		this.dni = dni;
+		this.edad = nacimiento.diferenciaAnios(Fecha.hoy(), nacimiento);
+		this.prioridad = prioridad;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -33,19 +38,8 @@ public class Persona implements Comparable<Persona> {
 		return true;
 	}
 
-	public Persona(int dni, Fecha nacimiento, int prioridad) {
-		this.dni = dni;
-		this.edad = nacimiento.diferenciaAnios(Fecha.hoy(), nacimiento);
-		this.prioridad = prioridad;
-		this.vacunado = false;
-	}
-
 	public int getDni () {
 		return dni; 
-	}
-
-	public void setVacunado() { 
-		vacunado = true; 
 	}
 	
 	public Fecha getTurno() {

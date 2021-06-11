@@ -1,7 +1,9 @@
 package trabajoPractico;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Set;
 
@@ -9,106 +11,163 @@ public class Almacen {
 	private static HashMap<String, Integer> stock;
 	private static HashMap<String, Integer> vencidas;
 	private static HashSet<Vacuna> listaVacunas;
+	private static HashSet<Vacuna> reservadas;
 	
 	public Almacen () { 
 		this.stock = new HashMap <String,Integer>();
 		this.vencidas = new HashMap <String,Integer>();
 		this.listaVacunas = new HashSet <Vacuna>();
+		this.reservadas = new HashSet<Vacuna>();
 	}
-	
 	
 	public static HashMap<String,Integer> reporteVacunasVencidas() {
 		return vencidas;
 	}
 	
 	public static boolean esValida(String nombreVacuna) {
-		if (nombreVacuna.equals("Sputnik") || nombreVacuna.equals("Sinopharm") || nombreVacuna.equals("Pfizer") || nombreVacuna.equals("Moderna") || nombreVacuna.equals("Astrazeneca"))   {
+		if (nombreVacuna.equals("Sputnik") || nombreVacuna.equals("Sinopharm") || nombreVacuna.equals("Pfizer") || nombreVacuna.equals("Moderna") || nombreVacuna.equals("AstraZeneca"))   {
 			return true;
 		}
 		return false; 
 	}
 	
 	public static void ingresarVacuna(String nombre, int Cantidad, Fecha fechaIngreso) {
-		if (nombre.equals("Sputnik"))
-				listaVacunas.add(new Vacuna3Grados(nombre,true,fechaIngreso));
-		if (nombre.equals("Pfizer")) 
-				listaVacunas.add(new VacunaMenos18(nombre,true,fechaIngreso));
-		if (nombre.equals("Sinopharm"))
-				listaVacunas.add(new Vacuna3Grados(nombre,false,fechaIngreso));
-		if (nombre.equals("Moderna")) 
-				listaVacunas.add(new VacunaMenos18(nombre,false,fechaIngreso));	
-		if (nombre.equals("Astrazeneca"))
-				listaVacunas.add(new Vacuna3Grados(nombre,false,fechaIngreso));
-		}
+			int c = 0;
+			if (stock.containsKey(nombre))
+				c = stock.get(nombre);
+			if (nombre.equals("Sputnik")) {
+				for(int i = 0; i<Cantidad; i++) {
+					listaVacunas.add(new Vacuna3Grados(nombre,true,fechaIngreso));
+				}
+				if (stock.containsKey(nombre))
+					stock.replace(nombre, Cantidad + c);
+				else 
+					stock.put(nombre, Cantidad);
+			}
+			if (nombre.equals("Sinopharm") || nombre.equals("AstraZeneca")) {
+				for(int i = 0; i<Cantidad; i++) {
+					listaVacunas.add(new Vacuna3Grados(nombre,false,fechaIngreso));
+				}
+				if (stock.containsKey(nombre))
+					stock.replace(nombre, Cantidad + c);
+				else 
+					stock.put(nombre, Cantidad);
+			}
+			if (nombre.equals("Moderna") || nombre.equals("Pfizer")) { 
+				for(int i = 0; i<Cantidad; i++) {
+					listaVacunas.add(new VacunaMenos18(nombre,false,fechaIngreso));
+				}
+				if (stock.containsKey(nombre))
+					stock.replace(nombre, Cantidad + c);
+				else 
+					stock.put(nombre, Cantidad);
+			}
+	}
 	
-	//FIXME
 	public static void quitarVencidas() { 
-		//error de nullpointer, recorrer de otra forma?
-		for (Vacuna v : listaVacunas) { 
-			if (v != null && v.DiasVencimiento() <= 0) {
-				vencidas.replace(v.getNombre(), vencidas.get(v.getNombre()) + 1 );
-				v= null;
+		int auxVencidas = 0;
+		int auxStock = 0;
+		Iterator <Vacuna> it = listaVacunas.iterator();
+		while (it.hasNext()) {
+			Vacuna otra = it.next();
+			if (otra.vencida()) {
+				if (vencidas.containsKey(otra.getNombre())) {
+					auxVencidas = vencidas.get(otra.getNombre());
+					vencidas.replace(otra.getNombre(), auxVencidas + 1);
+				} else {
+					vencidas.put(otra.getNombre(), 1);
+			} if (stock.get(otra.getNombre()) > 0) {
+					auxStock = stock.get(otra.getNombre());
+					stock.replace(otra.getNombre(), auxStock-1);
+					it.remove();
+			} else 
+				it.remove();
+				
 			}
 		}
 	}
-	
-	public HashSet<Vacuna> asignarVacunas(int prioridad, int cantidad) {
-		HashSet <Vacuna> vacunasListas = new HashSet <Vacuna>();
-		Integer contador = 0;
-		for (Vacuna v : listaVacunas) {
-			if(v.getPrioridadMayores() && prioridad == 1) {
-				contador++;
-				v.setAsignadaEnEspera();
-				vacunasListas.add(v);
-			}
 			
-			
-		if (contador == cantidad) { 
-			return vacunasListas;
-			}
-		}
-		return vacunasListas;
-	}
-	
 		
+
 	public static int vacunasDisponibles() { 
-		Integer contador = 0;
-		for (int i=0; i< stock.size(); i++) { 
-			contador += stock.get(i); 
+		int contador = 0;
+		for (Vacuna v: listaVacunas) { 
+			contador += 1;
 		}
 		return contador;
 	}
 
-
 	public static int vacunasDisponibles(String nombreVacuna) {
-		return stock.get(nombreVacuna);
+		if (stock.containsKey(nombreVacuna)) {
+			return stock.get(nombreVacuna);
+		}
+		return 0;
 	}
 
-
-	public static void asignarVacuna(int prioridad) {
-		if (prioridad == 1) {
-			for (String v : stock.keySet()) {
-				if (v == "Pfizer" && stock.get(v) > 0) {
-					stock.replace("Pfizer", stock.get(v)-1);
-				} else if (v == "Sputnik" && stock.get(v) > 0) {
-					stock.replace("Sputnik", stock.get(v)-1);
-				}
+	public static void reservar(int prioridad) {
+			if (listaVacunas.size() < 1) 
+			throw new RuntimeException ("No hay vacunas disponibles para vacunar");
+		Iterator <Vacuna> it = listaVacunas.iterator();
+		while (it.hasNext()) {
+			Vacuna otra = it.next();
+			if (prioridad == 1 && otra.getNombre().equals("Sputnik") || otra.getNombre().equals("Moderna") && stock.get(otra.getNombre())>0) {
+				reservadas.add(otra);
+				int auxStock = stock.get(otra.getNombre());
+				stock.replace(otra.getNombre(), auxStock -1);
+				it.remove();
+				return;
+			} else if (stock.get(otra.getNombre())>0){
+				reservadas.add(otra);
+				int auxStock = stock.get(otra.getNombre());
+				stock.replace(otra.getNombre(), auxStock -1);
+				it.remove();
+				return;
 			}
-		} else {
-			for (String v : stock.keySet()) {
-				if (v == "Moderna" && stock.get(v) > 0) {
-					stock.replace("Moderna", stock.get(v)-1);
-				} else if (v == "Sinopharm" && stock.get(v) > 0) {
-					stock.replace("Sinopharm", stock.get(v)-1);
-				} else if (v == "Astrazeneca" && stock.get(v) > 0) {
-					stock.replace("Astrazeneca", stock.get(v)-1);
-				} else {
-					throw new RuntimeException ("No hay vacunas disponibles");
-				}
-			}
-		
 		}
 	}
+	
+	
+	public static String vacunar(int prioridad) {
+		String elegida = new String();
+		Iterator <Vacuna> it = reservadas.iterator();
+		while (it.hasNext()) {
+			Vacuna otra = it.next(); 
+			if (prioridad == 1 && otra.getNombre().equals("Pfizer") || otra.getNombre().equals("Moderna")) {
+				elegida = otra.getNombre();
+				it.remove();
+			} else {
+				elegida = otra.getNombre();
+				it.remove();
+			}
+		}
+		return elegida; 
+	}
 
+		
+
+		public static void devolver(int prioridad) {
+			Iterator <Vacuna> it = reservadas.iterator();
+			while (it.hasNext()) {
+				Vacuna otra = it.next();
+				if (prioridad == 1 && otra.getPrioridadMayores()) {
+						listaVacunas.add(otra);
+						int auxStock = stock.get(otra.getNombre());
+						stock.replace(otra.getNombre(), auxStock+1);
+						it.remove();
+						return;
+				} else {
+						listaVacunas.add(otra);
+						int auxStock = stock.get(otra.getNombre());
+						stock.replace(otra.getNombre(), auxStock+1);
+						it.remove();
+						return; 
+				}
+			}
+		}
 }
+			
+	
+		
+
+
 
