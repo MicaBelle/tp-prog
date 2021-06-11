@@ -105,6 +105,7 @@ public class Almacen {
 	}
 
 	public static String asignarVacuna(int prioridad) {
+		quitarVencidas();
 		if (prioridad == 1) {
 			for (String v : stock.keySet()) {
 				if (v == "Pfizer" && stock.get(v) > 0) {
@@ -153,6 +154,33 @@ public class Almacen {
 		}
 	}
 		
+
+//		public static void devolver(int prioridad) {
+//			Iterator <Vacuna> it = reservadas.iterator();
+//			while (it.hasNext()) {
+//				Vacuna otra = it.next();
+//				if (prioridad == 1 && otra.getPrioridadMayores()) {
+//						listaVacunas.add(otra);
+//						if (stock.containsKey(otra.getNombre())) {
+//							int auxStock = stock.get(otra.getNombre());
+//							stock.replace(otra.getNombre(), auxStock+1);
+//						} else { 
+//							stock.put(otra.getNombre(), 1);
+//						}
+//				} else if (!otra.getPrioridadMayores()) {
+//						listaVacunas.add(otra);
+//					if (stock.containsKey(otra.getNombre())) {
+//						int auxStock = stock.get(otra.getNombre());
+//						stock.replace(otra.getNombre(), auxStock+1);
+//					} else { 
+//						stock.put(otra.getNombre(), 1);
+//					}
+//				}
+//			}
+//		}
+//			
+//	}
+//		
 }
 
 

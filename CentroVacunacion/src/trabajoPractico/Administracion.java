@@ -64,14 +64,17 @@ public class Administracion {
 			 }
 		}
 		
-		for (int i= 0;  i < CentroVacunacion.getCapacidad(); i++) { 
-			for (Persona p : colaPrioridad) { 
-					p.setTurno(fechaInicial);
-					turnosGenerados.put(p.getDni(), p);
+		int capacidad = CentroVacunacion.getCapacidad();
+			Iterator<Persona> it = colaPrioridad.iterator();
+			while (it.hasNext() && capacidad > 0) {
+				Persona otra = it.next();
+				otra.setTurno(fechaInicial);
+				turnosGenerados.put(otra.getDni(), otra);
+				it.remove();
+				capacidad--;
 			}
 		}
-		colaPrioridad.removeAll(colaPrioridad);
-	}
+	
 	
 	public List<Integer> turnosConFecha(Fecha fecha){
 		List <Integer> turnosConFecha = new LinkedList <Integer>();
@@ -109,21 +112,14 @@ public class Administracion {
 	}
 
 	public List<Integer> listaDeEspera() {
-		List <Integer> lista = new LinkedList <Integer>();
+		LinkedList<Integer> lista = new LinkedList<Integer>();
 		for (Persona p : colaPrioridad) {
-			if(p.getTurno() == null && !p.getVacunado()) {
-				lista.add(p.getDni());
-			}
+			lista.add(p.getDni());
 		}
 		return lista;
 	}
 	
-	/**
-	 * aqui se selecciona a las personas que recibiran la vacuna,
-	 * devolviendo una lista con los datos de las personas cuya cantidad 
-	 * esta determinada por la capacidad de vacunacion
-	 */
-	public ArrayList<Persona> asignarPersonas(int capacidad){
+	public static ArrayList<Persona> asignarPersonas(int capacidad){
 		ArrayList<Persona> asignados = new ArrayList<Persona>();
 		asignarColaPrioridad();
 		int cont = capacidad;

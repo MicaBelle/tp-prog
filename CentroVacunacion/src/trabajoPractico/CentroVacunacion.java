@@ -67,18 +67,11 @@ public class CentroVacunacion {
 	public List<Integer> listaDeEspera() {
 		return administracion.listaDeEspera();
 		}
-
-	// una vez recibidas las personas se debe buscar las vacunas para los de prioridad 1, osea saber la cantidad de personas en esa prioridad y luego buscar esa cantidad de vacunas		//luego de las vacunas de prioridad 1 hay que buscar las que quedan, es decir de la capacidad total restar las de prioridad 1
-	// recordar que si las vacunas de prio 1 no alcanzan entonces llenar con otras vacunas
-	// el centro debe recibir la info de los seleccionados y las vacunas, luego se generan turnos y se asignan a las personas, recordar que se esta usando aliasing, tener cuidado
-	// IMPORTANTE si no alcanzan las vacunas debe dejar de asiganrles, en caso de no haber suficientes personas no pasa nada ya que esta comtemplado en asignarPersonas
-	
 	
 	public void generarTurnos(Fecha fechaInicial) { 
 		if (fecha.hoy().posterior(fechaInicial))
 			throw new RuntimeException ("No se pueden generar turnos para una fecha pasada");
-		Almacen.quitarVencidas();
-	ArrayList<Persona> seleccionados = administracion.asignarPersonas(this.capacidad);
+		Administracion.asignarPersonas(this.capacidad);
 		
 	}
 

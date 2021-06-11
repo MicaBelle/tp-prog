@@ -29,12 +29,14 @@ public class Principal {
 		centro.inscribirPersona(13000000, new Fecha(1, 5, 1958), true, false);
 		centro.inscribirPersona(13000050, new Fecha(20, 6, 1958), false, true);
 		
-		centro.generarTurnos(fTurnos);
-
-		System.out.println("Vencidas: " + centro.reporteVacunasVencidas());
+		
+		
 		
 		System.out.println("-------------- Turnos -------------");
-		System.out.println("Lista espera: " + centro.listaDeEspera());
+		System.out.println("Lista espera previa a generar: " + centro.listaDeEspera());
+		centro.generarTurnos(fTurnos);
+		System.out.println("Vencidas: " + centro.reporteVacunasVencidas());
+		System.out.println("Lista espera al generar: " + centro.listaDeEspera());
 		System.out.println("Turnos con " + fTurnos + ": " + centro.turnosConFecha(fTurnos));
 		System.out.println("-----------------------------------");
 		System.out.println();
