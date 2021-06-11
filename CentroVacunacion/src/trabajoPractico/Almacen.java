@@ -24,6 +24,10 @@ public class Almacen {
 		return vencidas;
 	}
 	
+	public static HashSet<Vacuna> reservadas() {
+		return reservadas;
+	}
+	
 	public static boolean esValida(String nombreVacuna) {
 		if (nombreVacuna.equals("Sputnik") || nombreVacuna.equals("Sinopharm") || nombreVacuna.equals("Pfizer") || nombreVacuna.equals("Moderna") || nombreVacuna.equals("AstraZeneca"))   {
 			return true;
@@ -32,15 +36,15 @@ public class Almacen {
 	}
 	
 	public static void ingresarVacuna(String nombre, int Cantidad, Fecha fechaIngreso) {
-			int c = 0;
+			int auxStock = 0;
 			if (stock.containsKey(nombre))
-				c = stock.get(nombre);
+				auxStock = stock.get(nombre);
 			if (nombre.equals("Sputnik")) {
 				for(int i = 0; i<Cantidad; i++) {
 					listaVacunas.add(new Vacuna3Grados(nombre,true,fechaIngreso));
 				}
 				if (stock.containsKey(nombre))
-					stock.replace(nombre, Cantidad + c);
+					stock.replace(nombre, Cantidad + auxStock);
 				else 
 					stock.put(nombre, Cantidad);
 			}
@@ -49,7 +53,7 @@ public class Almacen {
 					listaVacunas.add(new Vacuna3Grados(nombre,false,fechaIngreso));
 				}
 				if (stock.containsKey(nombre))
-					stock.replace(nombre, Cantidad + c);
+					stock.replace(nombre, Cantidad + auxStock);
 				else 
 					stock.put(nombre, Cantidad);
 			}
@@ -58,7 +62,7 @@ public class Almacen {
 					listaVacunas.add(new VacunaMenos18(nombre,false,fechaIngreso));
 				}
 				if (stock.containsKey(nombre))
-					stock.replace(nombre, Cantidad + c);
+					stock.replace(nombre, Cantidad + auxStock);
 				else 
 					stock.put(nombre, Cantidad);
 			}
@@ -104,83 +108,79 @@ public class Almacen {
 		return 0;
 	}
 
-	public static String asignarVacuna(int prioridad) {
-		quitarVencidas();
-		if (prioridad == 1) {
-			for (String v : stock.keySet()) {
-				if (v == "Pfizer" && stock.get(v) > 0) {
-					stock.replace("Pfizer", stock.get(v)-1);
-					return "Pfizer";
-				} else if (v == "Sputnik" && stock.get(v) > 0) {
-					stock.replace("Sputnik", stock.get(v)-1);
-					return "Sputnik";
-				}
-			}
-			Almacen.reasignarVacunas();
-		} else {
-			for (String v : stock.keySet()) {
-				if (v == "Moderna" && stock.get(v) > 0) {
-					stock.replace("Moderna", stock.get(v)-1);
-					return "Moderna";
-				} else if (v == "Sinopharm" && stock.get(v) > 0) {
-					stock.replace("Sinopharm", stock.get(v)-1);
-					return "Sinopharm";
-				} else if (v == "AstraZeneca" && stock.get(v) > 0) {
-					stock.replace("AstraZeneca", stock.get(v)-1);
-					return "AstraZeneca";
-					} 
-				}
-			Almacen.reasignarVacunas();
-			}
-			throw new RuntimeException ("No hay vacunas disponibles");
-		}
-
-	public static void reasignarVacunas() {
-		int contador = CentroVacunacion.getCapacidad();
+	public static void reservar(int prioridad) {
+			if (listaVacunas.size() < 1) 
+			throw new RuntimeException ("No hay vacunas disponibles para vacunar");
 		Iterator <Vacuna> it = listaVacunas.iterator();
 		while (it.hasNext()) {
 			Vacuna otra = it.next();
-			if (CentroVacunacion.getCapacidad() == 1 && contador > 0 && otra.getPrioridadMayores()) {
-					contador--;
-					reservadas.add(otra);
-					it.remove();
-			} else if(contador > 0 && !otra.getPrioridadMayores()) {
-				contador--;
+			if (prioridad == 1 && otra.getNombre().equals("Sputnik") || otra.getNombre().equals("Moderna") && stock.get(otra.getNombre())>0) {
 				reservadas.add(otra);
+				int auxStock = stock.get(otra.getNombre());
+				stock.replace(otra.getNombre(), auxStock -1);
 				it.remove();
+				return;
+			} else if (stock.get(otra.getNombre())>0){
+				reservadas.add(otra);
+				int auxStock = stock.get(otra.getNombre());
+				stock.replace(otra.getNombre(), auxStock -1);
+				it.remove();
+				return;
 			}
-			else 
-				break;
 		}
 	}
+	
+	
+	public static void vacunar(int prioridad) {
+		String elegida = new String();
+		Iterator <Vacuna> it = reservadas.iterator();
+		while (it.hasNext()) {
+			Vacuna otra = it.next(); 
+			if (prioridad == 1 && otra.getNombre().equals("Pfizer") || otra.getNombre().equals("Moderna")) {
+				elegida = otra.getNombre();
+				it.remove();
+				return; 
+			} else {
+				elegida = otra.getNombre();
+				it.remove();
+				return; 
+			}
+		}
+	}
+
 		
 
-//		public static void devolver(int prioridad) {
-//			Iterator <Vacuna> it = reservadas.iterator();
-//			while (it.hasNext()) {
-//				Vacuna otra = it.next();
-//				if (prioridad == 1 && otra.getPrioridadMayores()) {
-//						listaVacunas.add(otra);
-//						if (stock.containsKey(otra.getNombre())) {
-//							int auxStock = stock.get(otra.getNombre());
-//							stock.replace(otra.getNombre(), auxStock+1);
-//						} else { 
-//							stock.put(otra.getNombre(), 1);
-//						}
-//				} else if (!otra.getPrioridadMayores()) {
-//						listaVacunas.add(otra);
-//					if (stock.containsKey(otra.getNombre())) {
-//						int auxStock = stock.get(otra.getNombre());
-//						stock.replace(otra.getNombre(), auxStock+1);
-//					} else { 
-//						stock.put(otra.getNombre(), 1);
-//					}
-//				}
-//			}
-//		}
-//			
-//	}
-//		
+		public static void devolver(int prioridad) {
+			Iterator <Vacuna> it = reservadas.iterator();
+			while (it.hasNext()) {
+				Vacuna otra = it.next();
+				if (prioridad == 1 && otra.getPrioridadMayores()) {
+						listaVacunas.add(otra);
+						int auxStock = stock.get(otra.getNombre());
+						stock.replace(otra.getNombre(), auxStock+1);
+						it.remove();
+						return;
+				} else {
+						listaVacunas.add(otra);
+						int auxStock = stock.get(otra.getNombre());
+						stock.replace(otra.getNombre(), auxStock+1);
+						it.remove();
+						return; 
+				}
+			}
+		}
+
+		public static String dameVacuna(int prioridad) {
+			String elegida = new String();
+			for (Vacuna v : reservadas) {
+				if (prioridad == 1 && v.getPrioridadMayores()) {
+					elegida = v.getNombre(); 
+					break;
+				} else { 
+					elegida = v.getNombre();
+					break;
+				}
+			}
+			return elegida; 
+		}
 }
-
-

@@ -1,10 +1,10 @@
 package trabajoPractico;
 
-public abstract class Vacuna {
-	protected String nombre;
-	protected int temperatura;
-	protected Fecha fechaIngreso;
-	protected boolean prioridadMayores;
+abstract class Vacuna {
+	private String nombre;
+	private int temperatura;
+	private Fecha fechaIngreso;
+	private boolean prioridadMayores;
 	
 	public Vacuna (String nombre, int temperatura, Fecha fechaIngreso, boolean prioridadMayores) {
 		this.nombre = nombre;
@@ -13,29 +13,24 @@ public abstract class Vacuna {
 		this.prioridadMayores = prioridadMayores;
 	}
 	
+	
 	public String getNombre() {
 		return this.nombre;
 	}
 	
 	public Fecha getFechaIngreso() {
-		return this.fechaIngreso;
-	}
-	
-	public Integer getTemperatura() { 
-		return this.temperatura;
+		return fechaIngreso;
 	}
 	
 	public boolean vencida() {
-		return false;
+		return false; 
 	}
-
+	
 	protected boolean getPrioridadMayores() {
 		return prioridadMayores; 
 	}
 	
 	public String toString() { 
-		return "Nombre: " + this.nombre;
+		return "Nombre: " + this.nombre; 
 	}
-
 }
-

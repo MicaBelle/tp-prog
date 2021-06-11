@@ -71,10 +71,14 @@ public class CentroVacunacion {
 	public void generarTurnos(Fecha fechaInicial) { 
 		if (fecha.hoy().posterior(fechaInicial))
 			throw new RuntimeException ("No se pueden generar turnos para una fecha pasada");
-		Administracion.asignarPersonas(this.capacidad);
+		Administracion.generarTurnos(fechaInicial);
 		
 	}
 
+	public static HashSet<Vacuna> reservadas(){
+		return Almacen.reservadas();
+	}
+	
 	public List<Integer> turnosConFecha(Fecha fecha){
 		return administracion.turnosConFecha(fecha);
 	}
