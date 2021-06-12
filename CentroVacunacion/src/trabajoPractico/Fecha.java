@@ -33,8 +33,8 @@ public class Fecha implements Comparable<Fecha> {
 	}
 
 	/**
-	 * Definir que el dia actual es una fecha en particular. 
-	 * Permite simular que se está en un dia específico.
+	 * Definir que el dia actual es una fecha en particular. Permite simular que se
+	 * está en un dia específico.
 	 */
 	public static void setFechaHoy(int dia, int mes, int anio) {
 		hoy = new Fecha(dia, mes, anio);
@@ -99,18 +99,16 @@ public class Fecha implements Comparable<Fecha> {
 		if (getClass() != obj.getClass())
 			return false;
 		Fecha other = (Fecha) obj;
-		
-		if (fecha == null) 
+
+		if (fecha == null)
 			return other.fecha == null;
-		else 
+		else
 			return fecha.equals(other.fecha);
 	}
-	
+
 	@Override
 	public int hashCode() {
 		return fecha == null ? 0 : fecha.hashCode();
 	}
-	
-	
 
 }

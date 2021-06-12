@@ -2,12 +2,12 @@ package trabajoPractico;
 
 public class Persona implements Comparable<Persona> {
 
-	private  int dni;
-	private  int edad;
-	private  int prioridad;
-	private  Fecha turno;
-	private  boolean vacunado;
-	
+	private int dni;
+	private int edad;
+	private int prioridad;
+	private Fecha turno;
+	private boolean vacunado;
+
 	public Persona(int dni, Fecha nacimiento, int prioridad) {
 		this.dni = dni;
 		this.edad = nacimiento.diferenciaAnios(Fecha.hoy(), nacimiento);
@@ -40,41 +40,39 @@ public class Persona implements Comparable<Persona> {
 		return true;
 	}
 
-	public int getDni () {
-		return dni; 
+	public int getDni() {
+		return dni;
 	}
 
-	public void setVacunado() { 
-		vacunado = true; 
+	public void setVacunado() {
+		vacunado = true;
 	}
-	
+
 	public Fecha getTurno() {
-		return turno; 
+		return turno;
 	}
-	
-	
-	
+
 	public void setTurno(Fecha fecha) {
-		turno = fecha; 
+		turno = fecha;
 	}
 
 	public int getPrioridad() {
 		return this.prioridad;
 	}
-	
+
 	public boolean getVacunado() {
 		return this.vacunado;
 	}
-	
+
 	@Override
 	public int compareTo(Persona otra) {
 		if (this.prioridad == otra.prioridad) {
 			return 0;
 		} else if (this.prioridad < otra.prioridad) {
-			return 1;
+			return -1;
 		} else {
-			return -1; 
-		}	
+			return 1;
+		}
 	}
-	
+
 }
